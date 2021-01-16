@@ -1,0 +1,60 @@
+---
+title: 'ESM 244 Assignment 1: Task 1 - Data Wrangling & Visualization (Sierra Amphibians)'
+author: "Meghan Fletcher"
+date: "1/16/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE, echo = FALSE, message = FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+library(tidyverse)
+library(janitor)
+library(here)
+
+# For PCA:
+library(ggfortify)
+
+# For ggplot customization:
+library(readxl)
+library(gghighlight)
+library(lubridate)
+library(plotly)
+
+# To make compound figures:
+library(patchwork)
+```
+
+### Part 1: Create a graph of the total **mountain yellow-legged frog (*Rana muscosa*) count** from each year across all water bodies by life stage - excluding the 'EggMass' level.
+
+```{r}
+# Find the total number of adult, subadult, and tadpole yellow-legged frogs observed in the entire study region by life stage and year. Do not use the lake ID or amphibian_location in your analyses as additional grouping variables.
+
+total_frogs <- read_excel(here("data", "sierra_amphibians.xlsx")) %>% 
+  select(survey_date, amphibian_species, amphibian_life_stage, amphibian_number) %>% 
+  drop_na() %>% 
+  filter(amphibian_species == "RAMU") %>% 
+  mutate(date = ymd(survey_date)) %>% 
+  mutate(record_year = year(date)) %>% 
+  count(amphibian_life_stage, record_year) %>% 
+  filter(amphibian_life_stage != "EggMass")
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
