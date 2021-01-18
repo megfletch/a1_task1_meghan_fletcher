@@ -1,11 +1,11 @@
 ---
-title: 'ESM 244 Assignment 1: Task 1 - Data Wrangling & Visualization (Sierra Amphibians)'
+title: "ESM 244 Assignment 1: Task 1"
 author: "Meghan Fletcher"
 date: "1/16/2021"
 output: html_document
 ---
 
-```{r setup, include=FALSE, echo = FALSE, message = FALSE}
+```{r setup, include=FALSE, echo = FALSE, message = FALSE, warnings = FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 
 library(tidyverse)
@@ -25,10 +25,9 @@ library(plotly)
 library(patchwork)
 ```
 
-### Part 1: Create a graph of the total **mountain yellow-legged frog (*Rana muscosa*) count** from each year across all water bodies by life stage - excluding the 'EggMass' level.
 
 ```{r}
-# Find the total number of adult, subadult, and tadpole yellow-legged frogs observed in the entire study region by life stage and year. Do not use the lake ID or amphibian_location in your analyses as additional grouping variables.
+# Part 1: Find the total number of adult, subadult, and tadpole yellow-legged frogs observed in the entire study region by life stage and year. Do not use the lake ID or amphibian_location in your analyses as additional grouping variables.
 
 total_frogs <- read_excel(here("data", "sierra_amphibians.xlsx")) %>% 
   select(survey_date, amphibian_species, amphibian_life_stage, amphibian_number) %>% 
@@ -40,7 +39,52 @@ total_frogs <- read_excel(here("data", "sierra_amphibians.xlsx")) %>%
   filter(amphibian_life_stage != "EggMass")
 ```
 
+```{r}
+# Create a graph of the total **mountain yellow-legged frog (*Rana muscosa*) count** from each year across all water bodies by life stage - excluding the 'EggMass' level.
 
+graph_1 <- ggplot(data = total_frogs, aes(x = record_year, y = n)) +
+  geom_line(aes(color = amphibian_life_stage)) +
+  labs(x = "Year", y = "Number of Frogs", title = "Total Number of Mountain Yellow-Legged Frogs in the Sierra Nevadas", subtitle = "From 1995-2002", color = "Life Stage")  +
+  theme_bw() +
+  scale_y_continuous(expand = c(0,0)) +
+  scale_x_continuous(expand = c(0,0), breaks = c(1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002)) +
+  theme(legend.background = element_rect(fill="lightblue",
+                                  size=0.5, linetype="solid", 
+                                  colour ="black"))
+
+graph_1
+```
+
+```{r}
+# Part 2: Find the total counts (over all years of the study) of combined adult and subadult endangered mountain yellow-legged frogs (Rana muscosa) observed in the 5 lakes with the greatest total observed counts. (OK to have more if there are ties)
+
+adult_frogs <- read_excel(here("data", "sierra_amphibians.xlsx")) %>% 
+  filter(amphibian_species == "RAMU") %>% 
+  filter(amphibian_life_stage == c("Adult", "SubAdult")) %>% 
+  mutate(lake = case_when(TRUE~"Lake")) %>% 
+  unite(col = lake_id, c(lake, lake_id), sep = " ") %>%
+  group_by(lake_id) %>% 
+  summarize(total_amphibians = sum(amphibian_number)) %>% 
+  slice_max(total_amphibians, n = 5)
+```
+
+```{r}
+graph_2 <- ggplot(data = adult_frogs, aes(x = fct_reorder(lake_id, total_amphibians), y = total_amphibians)) +
+  geom_col(fill= "cyan4") +
+  labs(x = "Lake ID", y = "Total Adult & Subadult Frogs", title = "Lakes Containing the Top 5 Greatest Counts of Adult/Subadult Mountain Yellow-Legged Frogs", subtitle = "Data collected from 1995-2002") +
+  theme_bw() +
+  geom_text(aes(label=total_amphibians, vjust = -0.3)) 
+
+graph_2
+```
+
+```{r}
+# Combine both graphs from above using the 'patchwork' function
+
+graph_3 <- (graph_1 / graph_2) 
+
+graph_3
+```
 
 
 
