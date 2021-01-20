@@ -38,8 +38,12 @@ autoplot(food_groups_pca,
          data = food_groups_complete,
          colour = 'food_group',
          loadings = TRUE,
-         loadings.label = TRUE) +
-  theme_bw()
+         loadings.label = TRUE,
+         loadings.colour = "black",
+         loadings.label.colour = "black",
+         alpha = .3) +
+  theme_bw() +
+  theme(legend.position = 'none') 
   
   
 ```
