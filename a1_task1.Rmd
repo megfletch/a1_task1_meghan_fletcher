@@ -5,15 +5,12 @@ date: "1/16/2021"
 output: html_document
 ---
 
-```{r setup, include=FALSE, echo = FALSE, message = FALSE, warnings = FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
 
 library(tidyverse)
 library(janitor)
 library(here)
-
-# For PCA:
-library(ggfortify)
 
 # For ggplot customization:
 library(readxl)
@@ -44,7 +41,7 @@ total_frogs <- read_excel(here("data", "sierra_amphibians.xlsx")) %>%
 
 graph_1 <- ggplot(data = total_frogs, aes(x = record_year, y = n)) +
   geom_line(aes(color = amphibian_life_stage)) +
-  labs(x = "Year", y = "Number of Frogs", title = "Total Number of Mountain Yellow-Legged Frogs in the Sierra Nevadas", subtitle = "From 1995-2002", color = "Life Stage")  +
+  labs(x = "Year", y = "Number of Frogs", title = "Total Number of Mountain Yellow-Legged Frogs in the Sierra Nevadas", subtitle = "Data collected from 1995-2002", color = "Life Stage")  +
   theme_bw() +
   scale_y_continuous(expand = c(0,0)) +
   scale_x_continuous(expand = c(0,0), breaks = c(1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002)) +
@@ -70,22 +67,25 @@ adult_frogs <- read_excel(here("data", "sierra_amphibians.xlsx")) %>%
 
 ```{r}
 graph_2 <- ggplot(data = adult_frogs, aes(x = fct_reorder(lake_id, total_amphibians), y = total_amphibians)) +
-  geom_col(fill= "cyan4") +
-  labs(x = "Lake ID", y = "Total Adult & Subadult Frogs", title = "Lakes Containing the Top 5 Greatest Counts of Adult/Subadult Mountain Yellow-Legged Frogs", subtitle = "Data collected from 1995-2002") +
+  geom_col(fill= "paleturquoise2") +
+  labs(x = "Lake ID", y = "Total Adult & Subadult Frogs", title = "Lakes Containing the Most Adult/Subadult Mountain Yellow-Legged Frogs", subtitle = "Data collected from 1995-2002") +
   theme_bw() +
-  geom_text(aes(label=total_amphibians, vjust = -0.3)) 
+  geom_text(aes(label=total_amphibians, vjust = 2)) +
+  scale_y_continuous(expand = c(0,0)) +
+  geom_text(aes(x=1, y=1700, label="Stretch it"), vjust=-5)
 
 graph_2
 ```
 
-```{r}
+```{r, fig.cap="**Figure 1:** The top graph shows the occurence of the life stages (adult, subadult and tadpole) of mountain yellow-legged frogs recorded by Dr. Knapp and his team from 1995 to 2002. The bottom graph reveals the 5 lakes that had the largest recorded combined subadult and adult populations of mountain yellow-legged frogs from 1995 to 2002."}
 # Combine both graphs from above using the 'patchwork' function
-
 graph_3 <- (graph_1 / graph_2) 
 
 graph_3
+
 ```
 
+#### **Data citation:** Knapp, R.A., C. Pavelka, E.E. Hegeman, and T.C. Smith. 2020. The Sierra Lakes Inventory Project: Non-Native fish and community composition of lakes and ponds in the Sierra Nevada, California ver 2. Environmental Data Initiative. https://doi.org/10.6073/pasta/d835832d7fd00d9e4466e44eea87fab3
 
 
 
