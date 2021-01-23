@@ -1,0 +1,73 @@
+---
+title: 'ESM 244 Assignment 1: Task 2'
+author: "Meghan Fletcher"
+date: "1/17/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
+
+library(tidyverse)
+library(janitor)
+library(here)
+
+# For PCA:
+library(ggfortify)
+
+```
+
+
+### **Overview:** FoodData Central uses a list of nutrients from the U.S. Department of Agriculture to provide information on the nutient levels of various food groups. In the elaborate list created, one can view a multitude of nutrients per item listed in each food group. In this analysis, PCA is performed and a biplot is created in order to show a couple of the nutrient differences amongst the food groups Fruits and Fruit Juices, Nut and Seed Products, Poultry Products and Vegetables and Vegetable Products. More specifically, the analysis will reveal which food groups are associated most with energy (kcal), protein (g), carbohydrates (g), sugars (g) and fiber (g). This analysis can also reveal which of the four food groups listed are most related to one another based on the nutrients reviewed (Data: FoodData Central, 2018).  
+
+
+```{r, fig.cap="**Figure: 1** The biplot created from our PCA analysis demonstrates to relationship between four major food groups (Fruits and Fruit Juices, Nut and Seed Products, Poultry Products and Vegetables and Vegetable Products) and six major nutirent categories (energy (kcal), protein (g), carbohydrates (g), sugars (g) and fiber (g)). The positions of the arrows allows us to make general conclusions regarding the relationships between these food groups and the nutrients selected. (Data: FoodData Central, 2018)" }
+
+food_groups_complete <- read_csv(here("data", "usda_nutrients.csv")) %>% 
+  clean_names() %>% 
+  filter(food_group %in% c("Fruits and Fruit Juices", "Nut and Seed Products", "Poultry Products", "Vegetables and Vegetable Products")) %>% 
+  select(food_group, energy_kcal, ends_with("_g")) %>%
+  drop_na()
+
+# Read in plastics data and prep for PCA - include only energy and variables endings in "_g"
+food_groups_pca <- food_groups_complete %>%
+  select(energy_kcal, ends_with("_g")) %>% 
+  scale() %>% 
+  prcomp()
+
+food_groups_pca$restoration
+
+
+# Create PCA plot
+autoplot(food_groups_pca,
+         data = food_groups_complete,
+         colour = 'food_group',
+         loadings = TRUE,
+         loadings.label = TRUE,
+         loadings.colour = "black",
+         loadings.label.colour = "black",
+         alpha = .5,
+         loadings.label.vjust = -0.5,
+         loadings.label.hjust = 0.95) +
+  theme_bw() +
+  theme(legend.background = element_rect(fill="lightblue",
+                                  size=0.5, linetype="solid", 
+                                  colour ="black")) +
+  labs(colour = "Food Groups", title = "PCA Analysis of 4 Major Food Groups and 6 Major Nutrients")
+```
+
+### **Summary:** Based on the biplot created, we can see the following trends:
+
+### 1. Fruits and fruit juices are highest in sugar content among the four food groups but lowest in protein content while poultry products are the lowest in sugar content but highest in protein content among the four groups.
+
+### 2. Nut and Seed products contain the greatest fat in addition to the greatest amounts of energy compared to the other three groups. This could potentially indicate that foods high in fat content give the greatest amount of energy as well. However, more analysis should be done using other food groups before this assumption can be made more concrete.
+
+### 3. Fruits and Vegetables appear to share the most similarity in carbohydrate and sugar content.
+
+### 4. Fiber is most associated with vegetables and some nut/seed products.
+
+### 5. Poultry and nut/seed products appear to be more similar (higher protein and fat content) using the six nutrients examined, while fruit and vegetable products appear to be more more similar (higher sugar and carbohydrate content).
+
+
+
+### **Data citation:** FoodData Central. Usda.gov. [accessed 2021 Jan 22]. https://fdc.nal.usda.gov/index.html
