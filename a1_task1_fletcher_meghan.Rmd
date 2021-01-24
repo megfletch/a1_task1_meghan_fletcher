@@ -20,6 +20,9 @@ library(plotly)
 
 # To make compound figures:
 library(patchwork)
+
+# Add new color palettes:
+library(viridis)
 ```
 
 
@@ -48,7 +51,8 @@ graph_1 <- ggplot(data = total_frogs, aes(x = record_year, y = n)) +
   scale_x_continuous(expand = c(0,0), breaks = c(1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002)) +
   theme(legend.background = element_rect(fill="lightblue",
                                   size=0.5, linetype="solid", 
-                                  colour ="black"))
+                                  colour ="black")) +
+  scale_color_brewer(palette="Dark2")
 ```
 
 ```{r}
@@ -70,15 +74,19 @@ adult_frogs <- read_excel(here("data", "sierra_amphibians.xlsx")) %>%
 # Create graph of lakes with highest combined adult and subadult mountain yellow-legged frogs
 
 graph_2 <- ggplot(data = adult_frogs, aes(x = fct_reorder(lake_id, total_amphibians), y = total_amphibians)) +
-  geom_col(fill= "paleturquoise2") +
-  labs(x = "Lake ID", y = "Total Adult & Subadult Frogs", title = "Lakes Containing the Most Adult/Subadult Mountain Yellow-Legged Frogs", subtitle = "Data collected from 1995-2002") +
+  geom_col(aes(fill = lake_id)) +
+  labs(x = " ", y = "Number of Frogs", title = "Lakes Containing the Most Adult/Subadult Mountain Yellow-Legged Frogs", subtitle = "Data collected from 1995-2002") +
   theme_bw() +
-  geom_text(aes(label=total_amphibians, vjust = 2)) +
+  geom_text(aes(label=total_amphibians, vjust = -0.3)) +
   scale_y_continuous(expand = c(0,0)) +
-  geom_text(aes(x=1, y=1700, label="Stretch it"), vjust=-5)
+  geom_text(aes(x=1, y=1900, label="Stretch it"), vjust=-5) +
+  theme(legend.position = "none") +
+  scale_color_viridis(discrete = TRUE)+
+  scale_fill_viridis(discrete = TRUE)
+  
 ```
 
-```{r, fig.cap="**Figure 1:** Data was collected within the southern Sierra Nevada mountains under the Sierra Lakes Inventory Porject. The top graph shows the occurence of the life stages (adult, subadult and tadpole) of mountain yellow-legged frogs recorded by Dr. Knapp and his team from 1995 to 2002. The bottom graph reveals the 5 lakes that had the largest recorded combined subadult and adult populations of mountain yellow-legged frogs from 1995 to 2002 (Data: Knapp et al.)."}
+```{r, fig.cap="**Figure 1:** Data was collected within the southern Sierra Nevada mountains under the Sierra Lakes Inventory Porject. The top graph shows the occurence of the life stages (adult, subadult and tadpole) of mountain yellow-legged frogs recorded by Dr. Knapp and his team from 1995 to 2002. The bottom graph reveals the 5 lakes that had the largest recorded combined subadult and adult populations of mountain yellow-legged frogs from 1995 to 2002. This critical data can help us determine which lakes this species appears most successful in as well as how the overall species count has fulctuated over time. Scientisits can use this data to make appropriate conservation plans for the species (Data: Knapp et al.)."}
 
 # Combine both graphs from above using the 'patchwork' function
 graph_3 <- (graph_1 / graph_2) 
